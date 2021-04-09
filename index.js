@@ -2,14 +2,15 @@ const express = require('express')
 const app = express()
 const port = 5000
 
-const { User } = require('./models/User')
 const bodyParser = require('body-parser')
+const { User } = require('./models/User')
 
 const mongoose = require('mongoose')
 
 const config = require('./config/key')
 
 // MongoDB 연결할때 필요한 주소
+// 
 mongoose.connect(config.mongoURI, {
     useNewUrlParser:true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false
 }).then(() => console.log('MongoDB Connect-'))
@@ -31,6 +32,7 @@ app.post('/register', (req, res) => {
     // 회원가입 할 때 필요한 정보들을 client에서 가져오면
     // 그것들을 데이터 베이스에 넣어줌
 
+    // req.body 안에는 json 형식으로 데이터가 들어있음
     const user = new User(req.body)
 
     // save()는 몽고 DB의 메서드
@@ -40,7 +42,6 @@ app.post('/register', (req, res) => {
             success: true
         })
     })
-
 })
 
 app.listen(port, () => {
