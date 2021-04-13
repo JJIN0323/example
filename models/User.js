@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+
 // salt가 몇자리인지 정하는것
 const saltRounds = 10
 
@@ -58,29 +60,39 @@ userSchema.pre('save', function (next) {
                 next()
             })
         })
-    } else {
+    } else { //비밀번호 이외의 다른것을 변경하면 넘긴다
         next()
     }
 })
-/**
-    if (user.isModified('password')) {
-        bcrypt.genSalt(saltRounds, function(err, salt) {
-            if (err) return next(err)
-            console.log(salt, 'ㅇㅕ기에러1')
-    
-            bcrypt.hash(user.password, salt, function(err, hash) {
-                if (err) return next(err)
-                console.log(hash, '에러?')
-    
-                user.password = hash
-                next()
-                console.log('ㅇㅕ기에러2')
-            })
-        })
-    }**/
+
+  userSchema.methods.comparePassword = function(plainPssword, callback) {
+      // 입력된 비밀번호 1234 # 데이터베이스에 입력된 암호화된 비밀번호 $2b$10$RH3BJTKAn34YNQDrAH69RO 
+      // bycrypt를 복호화 할 순 없으므로, 1234를 암호화 해서 비교해야함
+      bcrypt.compare(plainPssword, this.password, function(err, isMatch) {
+          if (err) return callback(err)
+          callback(null, isMatch)
+      })
+  }
+
+  userSchema.methods.generateToken = function(callback) {
+
+    var user = this
+
+      // jsonwebtoken을 이용해서 token을 생성하기
+      var token = jwt.sign(user._id.toHexString(), 'secretToken')
+
+      // user id와 'secretToken'을 합쳐서 고유의 토큰을 만들고,
+      // 역으로 'secretToken'을 넣으면 id가 나옴
+      //user._id + 'secretToken' = token
+
+      user.token = token
+      user.save(function(err, user) {
+          if (err) return callback(err)
+          callback(null, user)
+      })
+  }
+
 
 const User = mongoose.model('User', userSchema)
 
-module.exports = {
-    User
-} // 다른곳에서도 쓸 수 있게 해줌
+module.exports = { User } // 다른곳에서도 쓸 수 있게 해줌
