@@ -5,6 +5,7 @@ const port = 5000
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const { User } = require('./models/User')
+const { auth } = require('./middleware/auth')
 
 const mongoose = require('mongoose')
 
@@ -29,7 +30,7 @@ app.use(cookieParser())
 
 // 회원가입을 위한 라우트
 
-app.post('/register', (req, res) => {
+app.post('/api/user/register', (req, res) => {
     
     // 회원가입 할 때 필요한 정보들을 client에서 가져오면
     // 그것들을 데이터 베이스에 넣어줌
@@ -46,7 +47,7 @@ app.post('/register', (req, res) => {
     })
 })
 
-app.post('/login', (req, res) => {
+app.post('/api/user/login', (req, res) => {
   //1. 요청된 이메일을 데이터베이스에서 찾는다
   User.findOne({email: req.body.email}, (err, user) => {
     if (!user) {
@@ -55,6 +56,8 @@ app.post('/login', (req, res) => {
         message: '해당 이메일을 찾을 수 없습니다.'
       })
     }
+
+    console.log('1. User : ', user)
 
     //2. 요청된 이메일이 데이터베이스에 있다면 비밀번호가 맞는지 확인한다
     user.comparePassword(req.body.password, (err, isMatch) => {
@@ -78,6 +81,34 @@ app.post('/login', (req, res) => {
       })
     })
   }) 
+})
+
+app.get('/api/user/auth', auth, (req, res) => {
+
+  // 여기까지 미들웨어를 통과해 왔다는 것은, Authentication이 True라는 것
+  res.status(200).json({
+    _id: req.user._id,
+    // role 0) 일반유저 role 0이 아니면 관리자 
+    isAdmin: req.user.role === 0 ? false : true,
+    isAuth: true,
+    name: req.user.name,
+    lastname: req.user.lastname,
+    role: req.user.role,
+    email: req.user.email,
+    image: req.user.image
+  })
+})
+
+app.get('/api/user/logout', auth, (req, res) => {
+  User.findOneAndUpdate({ _id: req.user._id}, {token: ''}, (err, user) => {
+    if (err) return res.json({
+      success : false,
+      err
+    })
+    return res.status(200).send({
+      success : true
+    })
+  })
 })
 
 app.listen(port, () => {

@@ -52,7 +52,7 @@ userSchema.pre('save', function (next) {
 
         bcrypt.genSalt(saltRounds, function (err, salt) {
             if (err) return next(err)
-            console.log(salt, '여기?')
+            //console.log(salt, '여기?')
 
             bcrypt.hash(user.password, salt, function (err, hash) {
                 if (err) return next(err)
@@ -65,6 +65,7 @@ userSchema.pre('save', function (next) {
     }
 })
 
+  // index.js의 60번 줄에 메서드를 만들어줌
   userSchema.methods.comparePassword = function(plainPssword, callback) {
       // 입력된 비밀번호 1234 # 데이터베이스에 입력된 암호화된 비밀번호 $2b$10$RH3BJTKAn34YNQDrAH69RO 
       // bycrypt를 복호화 할 순 없으므로, 1234를 암호화 해서 비교해야함
@@ -80,6 +81,7 @@ userSchema.pre('save', function (next) {
 
       // jsonwebtoken을 이용해서 token을 생성하기
       var token = jwt.sign(user._id.toHexString(), 'secretToken')
+      console.log('id token : ', token)
 
       // user id와 'secretToken'을 합쳐서 고유의 토큰을 만들고,
       // 역으로 'secretToken'을 넣으면 id가 나옴
@@ -89,6 +91,21 @@ userSchema.pre('save', function (next) {
       user.save(function(err, user) {
           if (err) return callback(err)
           callback(null, user)
+      })
+  }
+
+  userSchema.statics.findToken = function(token, callback) {
+      var user = this
+      
+      // 토큰을 decode 한다
+      jwt.verify(token, 'secretToken', function(err, decoded) {
+        console.log('decoded : ',decoded)
+        // 유저 아이디를 이용해서 유저를 찾고
+        // 클라이언트에서 가져온 token과 DB에 보관된 토큰이 일치하는지 확인
+        user.findOne({'_id': decoded, 'token': token}, function(err, user) {
+            if (err) return callback(err)
+            callback(null, user)
+        })
       })
   }
 
