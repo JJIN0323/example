@@ -22,6 +22,10 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
+app.get('/api/hello', (req, res) => {
+  res.send('안녕하세요~')
+})
+
 // 어플리케이션의 데이터를 분석해서 가져오는 역할
 app.use(bodyParser.urlencoded({extended: true}))
 // 어플리케이션의 json 데이터를 분석해서 가져오는 역할
