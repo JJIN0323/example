@@ -18,14 +18,6 @@ mongoose.connect(config.mongoURI, {
 }).then(() => console.log('MongoDB Connect-'))
   .catch(err => console.log('ERROR'))
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
-app.get('/api/hello', (req, res) => {
-  res.send('안녕하세요~')
-})
-
 // 어플리케이션의 데이터를 분석해서 가져오는 역할
 app.use(bodyParser.urlencoded({extended: true}))
 // 어플리케이션의 json 데이터를 분석해서 가져오는 역할
@@ -61,7 +53,7 @@ app.post('/api/user/login', (req, res) => {
       })
     }
 
-    console.log('1. User : ', user)
+    console.log('User : ', user)
 
     //2. 요청된 이메일이 데이터베이스에 있다면 비밀번호가 맞는지 확인한다
     user.comparePassword(req.body.password, (err, isMatch) => {

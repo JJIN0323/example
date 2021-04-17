@@ -13,19 +13,6 @@ function App() {
   return (
     <Router>
       <div>
-        {/*<ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/about">About</Link>
-          </li>
-          <li>
-            <Link to="/dashboard">Dashboard</Link>
-          </li>
-        </ul>*/}
-
-        <hr />
 
         <Switch>
           {/* exact는 이하 경로를 중복 출력하지 않도록한다. */}

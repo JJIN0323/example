@@ -1,0 +1,25 @@
+/* 2021-04-16 HYEJIN */
+
+.wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* FORM */
+
+.formDirection {
+    display: flex;
+    flex-direction: column;
+}
+
+.formDirection > input {
+    margin: 10px 0 0 0;
+}
+
+.formDirection > button {
+    margin-top: 10px;
+}
+
