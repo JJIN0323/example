@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import axios from 'axios'
-import { response } from 'express'
+import { withRouter } from 'react-router-dom'
+import { Button } from 'antd';
 
 function LandingPage(props) {
 
@@ -26,10 +27,10 @@ function LandingPage(props) {
 
             HOME
             <br/>
-            <button onClick={onClickHandler}>로그아웃</button>
+            <Button type="primary" onClick={onClickHandler}>로그아웃</Button>
         
         </div>
     )
 }
 
-export default LandingPage
+export default withRouter(LandingPage)
